@@ -200,6 +200,27 @@
       transform: scale(1.2) translateY(-2px);
       box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
     }
+
+    .bullet-style-btn {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #e2e8f0;
+      border-radius: 5px;
+      width: 30px;
+      height: 28px;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+    .bullet-style-btn:hover {
+      background: #3b82f6;
+      border-color: #3b82f6;
+      color: #fff;
+      transform: scale(1.1);
+    }
     
     .format-select {
       background: rgba(255, 255, 255, 0.1);
@@ -1546,7 +1567,7 @@
 
     #tpl-classic .exp-entry {
       margin-bottom: 14px;
-      padding-left: 12px;
+      padding-left: 17px;
       border-left: 2px solid #3282b8;
     }
 
@@ -1827,7 +1848,7 @@
 
     #tpl-modern .exp-entry {
       margin-bottom: 13px;
-      padding-left: 11px;
+      padding-left: 16px;
       border-left: 2px solid #4A90D9;
     }
 
@@ -2234,7 +2255,7 @@
 
     #tpl-creative .exp-entry {
       margin-bottom: 14px;
-      padding: 10px 12px;
+      padding: 10px 12px 10px 17px;
       background: #FAFAFF;
       border-radius: 8px;
       border-left: 3px solid #7C3AED;
@@ -2720,7 +2741,7 @@
       margin-bottom: 13px;
       background: #fff;
       border-radius: 8px;
-      padding: 10px 12px;
+      padding: 10px 12px 10px 17px;
       border: 1px solid #E2E8F0;
       border-left: 3px solid #22D3EE;
     }
@@ -2930,13 +2951,16 @@
             <option value="'Courier New'">Monospace</option>
           </select>
           <select class="format-select" id="fontSize" onchange="applyStyle('fontSize', this.value)" title="Font Size">
-            <option value="1">Small</option>
-            <option value="3" selected>Normal</option>
-            <option value="5">Large</option>
-            <option value="7">Huge</option>
+            <option value="1">8</option>
+            <option value="2">10</option>
+            <option value="3" selected>12</option>
+            <option value="4">14</option>
+            <option value="5">18</option>
+            <option value="6">24</option>
+            <option value="7">36</option>
           </select>
         </div>
-        
+
         <div class="format-group">
           <button class="format-btn" onclick="applyStyle('bold')" title="Bold (Ctrl+B)"><b>B</b></button>
           <button class="format-btn" onclick="applyStyle('italic')" title="Italic (Ctrl+I)"><i>I</i></button>
@@ -2958,6 +2982,51 @@
           </button>
           <button class="format-btn format-btn-special" onclick="applyStyle('removeFormat')" title="Clear Formatting (🧼 Clean)">🧼</button>
           <button class="format-btn format-btn-special" onclick="toggleFormatPainter()" id="formatPainterBtn" title="Format Painter (🎨 Copy Style)">🎨</button>
+        </div>
+
+        <div class="format-group">
+          <!-- Bullet list -->
+          <button class="format-btn" onclick="applyStyle('insertUnorderedList')" title="Bullet List">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/>
+              <circle cx="4" cy="6" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none"/>
+            </svg>
+          </button>
+          <!-- Numbered list -->
+          <button class="format-btn" onclick="applyStyle('insertOrderedList')" title="Numbered List">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/>
+              <text x="1" y="7" font-size="5" fill="currentColor" stroke="none" font-family="sans-serif">1.</text>
+              <text x="1" y="13" font-size="5" fill="currentColor" stroke="none" font-family="sans-serif">2.</text>
+              <text x="1" y="19" font-size="5" fill="currentColor" stroke="none" font-family="sans-serif">3.</text>
+            </svg>
+          </button>
+          <!-- Bullet style picker dropdown -->
+          <div class="bullet-picker-wrap" style="position:relative;">
+            <button class="format-btn format-btn-special" onclick="toggleBulletPicker(event)" title="Bullet Style">▾</button>
+            <div id="bulletPickerPanel" style="display:none; position:absolute; top:110%; left:0; background:#1e293b; border:1px solid #334155; border-radius:8px; padding:8px; z-index:999; min-width:180px; box-shadow:0 4px 16px rgba(0,0,0,0.4);">
+              <div style="font-size:10px; color:#94a3b8; margin-bottom:6px; font-weight:600; letter-spacing:.5px;">BULLET STYLE</div>
+              <div style="display:flex; flex-wrap:wrap; gap:4px;">
+                <button class="bullet-style-btn" onclick="applyBulletChar('•')" title="Filled Circle">•</button>
+                <button class="bullet-style-btn" onclick="applyBulletChar('◦')" title="Open Circle">◦</button>
+                <button class="bullet-style-btn" onclick="applyBulletChar('▪')" title="Filled Square">▪</button>
+                <button class="bullet-style-btn" onclick="applyBulletChar('▫')" title="Open Square">▫</button>
+                <button class="bullet-style-btn" onclick="applyBulletChar('▶')" title="Triangle">▶</button>
+                <button class="bullet-style-btn" onclick="applyBulletChar('➤')" title="Arrow">➤</button>
+                <button class="bullet-style-btn" onclick="applyBulletChar('✓')" title="Checkmark">✓</button>
+                <button class="bullet-style-btn" onclick="applyBulletChar('✦')" title="Star">✦</button>
+                <button class="bullet-style-btn" onclick="applyBulletChar('–')" title="Dash">–</button>
+                <button class="bullet-style-btn" onclick="applyBulletChar('→')" title="Right Arrow">→</button>
+                <button class="bullet-style-btn" onclick="applyBulletChar('⁃')" title="Hyphen Bullet">⁃</button>
+                <button class="bullet-style-btn" onclick="applyBulletChar('◆')" title="Diamond">◆</button>
+              </div>
+              <div style="font-size:10px; color:#94a3b8; margin:8px 0 4px; font-weight:600; letter-spacing:.5px;">INDENT</div>
+              <div style="display:flex; gap:4px;">
+                <button class="bullet-style-btn" onclick="applyStyle('indent')" title="Increase Indent" style="font-size:13px;">⇥</button>
+                <button class="bullet-style-btn" onclick="applyStyle('outdent')" title="Decrease Indent" style="font-size:13px;">⇤</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -6155,6 +6224,51 @@
       document.execCommand(command, false, value);
       autoSave();
       if (typeof paginateActive === 'function') paginateActive();
+    }
+
+    // ── Bullet / List helpers ──────────────────────────────────────
+    function toggleBulletPicker(e) {
+      e.stopPropagation();
+      const panel = document.getElementById('bulletPickerPanel');
+      const isOpen = panel.style.display !== 'none';
+      document.querySelectorAll('#bulletPickerPanel').forEach(p => p.style.display = 'none');
+      panel.style.display = isOpen ? 'none' : 'block';
+    }
+
+    document.addEventListener('click', function(e) {
+      const panel = document.getElementById('bulletPickerPanel');
+      if (panel && !panel.contains(e.target) && !e.target.closest('.bullet-picker-wrap')) {
+        panel.style.display = 'none';
+      }
+    });
+
+    function applyBulletChar(char) {
+      document.getElementById('bulletPickerPanel').style.display = 'none';
+      const sel = window.getSelection();
+      if (!sel || sel.rangeCount === 0) return;
+
+      const range = sel.getRangeAt(0);
+      // If nothing selected, insert bullet at cursor on current line
+      if (range.collapsed) {
+        const node = document.createTextNode(char + '\u00A0');
+        range.insertNode(node);
+        range.setStartAfter(node);
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      } else {
+        // Prepend bullet to each selected line
+        const fragment = range.extractContents();
+        const div = document.createElement('div');
+        div.appendChild(fragment);
+        const text = div.innerHTML;
+        // Prepend char after <br>, <div>, <p> tags and at start
+        const bulleted = text
+          .replace(/^/, char + '\u00A0')
+          .replace(/(<br\s*\/?>|<\/div>|<\/p>)/gi, '$1' + char + '\u00A0');
+        document.execCommand('insertHTML', false, bulleted);
+      }
+      autoSave();
     }
 
     let _formatPainterActive = false;
