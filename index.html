@@ -241,30 +241,99 @@
     }
 
     .color-picker-wrap {
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 28px;
-      height: 28px;
     }
 
-    .color-picker-btn {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      border: 2px solid rgba(255, 255, 255, 0.8);
+    .color-swatch-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      border: 2px solid rgba(255,255,255,0.5);
       cursor: pointer;
+      background: #e53e3e;
       padding: 0;
-      overflow: hidden;
-      background: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.15s, transform 0.15s;
     }
+    .color-swatch-btn:hover {
+      border-color: #fff;
+      transform: scale(1.1);
+    }
+    .color-swatch-btn svg { pointer-events: none; }
 
-    .color-picker-btn::-webkit-color-swatch-wrapper {
-      padding: 0;
+    .color-palette-panel {
+      display: none;
+      position: absolute;
+      top: 110%;
+      left: 0;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 10px;
+      z-index: 9999;
+      width: 186px;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.5);
     }
-    .color-picker-btn::-webkit-color-swatch {
+    .color-palette-panel.open { display: block; }
+
+    .cp-label {
+      font-size: 9px;
+      color: #94a3b8;
+      font-weight: 600;
+      letter-spacing: .5px;
+      margin-bottom: 6px;
+    }
+    .cp-swatches {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+    .cp-swatch {
+      width: 22px;
+      height: 22px;
+      border-radius: 4px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: transform 0.12s, border-color 0.12s;
+    }
+    .cp-swatch:hover {
+      transform: scale(1.2);
+      border-color: #fff;
+    }
+    .cp-custom-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .cp-custom-input {
+      flex: 1;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 5px;
+      color: #fff;
+      font-size: 11px;
+      padding: 3px 6px;
+      outline: none;
+      font-family: monospace;
+    }
+    .cp-apply-btn {
+      background: #3b82f6;
       border: none;
+      border-radius: 5px;
+      color: #fff;
+      font-size: 11px;
+      padding: 4px 8px;
+      cursor: pointer;
+      white-space: nowrap;
     }
+    .cp-apply-btn:hover { background: #2563eb; }
 
     .painter-active {
       animation: painter-pulse 1.5s infinite;
@@ -550,14 +619,13 @@
     .save-status {
       font-size: 10px;
       font-weight: 700;
-      color: #10B981; 
+      color: #ef4444;
       text-transform: uppercase;
       letter-spacing: 1.5px;
       opacity: 0;
-      transform: translateY(5px);
+      transform: translateY(3px);
       transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       white-space: nowrap;
-      margin-top: 4px; /* Space below pagination */
     }
 
     .save-status.visible {
@@ -2941,7 +3009,7 @@
         </div>
 
         <div class="format-group">
-          <select class="format-select" id="fontFamily" onchange="applyStyle('fontName', this.value)" title="Font Family">
+          <select class="format-select" id="fontFamily" onmousedown="saveSelection()" onchange="restoreSelectionAndApply('fontName', this.value)" title="Font Family">
             <option value="'DM Sans'">DM Sans</option>
             <option value="'Playfair Display'">Playfair Display</option>
             <option value="'Inter'">Inter</option>
@@ -2950,7 +3018,7 @@
             <option value="Georgia">Georgia</option>
             <option value="'Courier New'">Monospace</option>
           </select>
-          <select class="format-select" id="fontSize" onchange="applyStyle('fontSize', this.value)" title="Font Size">
+          <select class="format-select" id="fontSize" onmousedown="saveSelection()" onchange="restoreSelectionAndApply('fontSize', this.value)" title="Font Size">
             <option value="1">8</option>
             <option value="2">10</option>
             <option value="3" selected>12</option>
@@ -2962,25 +3030,38 @@
         </div>
 
         <div class="format-group">
-          <button class="format-btn" onclick="applyStyle('bold')" title="Bold (Ctrl+B)"><b>B</b></button>
-          <button class="format-btn" onclick="applyStyle('italic')" title="Italic (Ctrl+I)"><i>I</i></button>
-          <button class="format-btn" onclick="applyStyle('underline')" title="Underline (Ctrl+U)"><u>U</u></button>
+          <button class="format-btn" onmousedown="event.preventDefault()" onclick="restoreSelectionAndApply('bold')" title="Bold (Ctrl+B)"><b>B</b></button>
+          <button class="format-btn" onmousedown="event.preventDefault()" onclick="restoreSelectionAndApply('italic')" title="Italic (Ctrl+I)"><i>I</i></button>
+          <button class="format-btn" onmousedown="event.preventDefault()" onclick="restoreSelectionAndApply('underline')" title="Underline (Ctrl+U)"><u>U</u></button>
           <div class="color-picker-wrap">
-             <input type="color" id="textColorPicker" class="color-picker-btn" oninput="applyStyle('foreColor', this.value)" title="Text Color">
+            <button class="color-swatch-btn" id="colorSwatchBtn"
+              onmousedown="event.preventDefault(); saveSelection(); toggleColorPalette(event)"
+              title="Text Color">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            </button>
+            <div class="color-palette-panel" id="colorPalettePanel">
+              <div class="cp-label">TEXT COLOR</div>
+              <div class="cp-swatches" id="cpSwatches"></div>
+              <div class="cp-label">CUSTOM HEX</div>
+              <div class="cp-custom-row">
+                <input class="cp-custom-input" id="cpHexInput" type="text" placeholder="#000000" maxlength="7">
+                <button class="cp-apply-btn" onmousedown="event.preventDefault()" onclick="applyCustomColor()">Apply</button>
+              </div>
+            </div>
           </div>
         </div>
 
         <div class="format-group">
-          <button class="format-btn" onclick="applyStyle('justifyLeft')" title="Align Left">
+          <button class="format-btn" onmousedown="event.preventDefault()" onclick="restoreSelectionAndApply('justifyLeft')" title="Align Left">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="17" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg>
           </button>
-          <button class="format-btn" onclick="applyStyle('justifyCenter')" title="Align Center">
+          <button class="format-btn" onmousedown="event.preventDefault()" onclick="restoreSelectionAndApply('justifyCenter')" title="Align Center">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="10" x2="6" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="18" y1="18" x2="6" y2="18"></line></svg>
           </button>
-          <button class="format-btn" onclick="applyStyle('justifyRight')" title="Align Right">
+          <button class="format-btn" onmousedown="event.preventDefault()" onclick="restoreSelectionAndApply('justifyRight')" title="Align Right">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" y1="10" x2="7" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="21" y1="18" x2="7" y2="18"></line></svg>
           </button>
-          <button class="format-btn format-btn-special" onclick="applyStyle('removeFormat')" title="Clear Formatting (🧼 Clean)">🧼</button>
+          <button class="format-btn format-btn-special" onmousedown="event.preventDefault()" onclick="restoreSelectionAndApply('removeFormat')" title="Clear Formatting (🧼 Clean)">🧼</button>
           <button class="format-btn format-btn-special" onclick="toggleFormatPainter()" id="formatPainterBtn" title="Format Painter (🎨 Copy Style)">🎨</button>
         </div>
 
@@ -3031,13 +3112,13 @@
       </div>
     </div>
 
-    <!-- Pagination & Status -->
+    <!-- Pagination -->
     <div class="toolbar-center">
       <nav class="pg-nav" id="pgNav" aria-label="Page navigation"></nav>
-      <div id="saveStatus" class="save-status">Draft Saved</div>
     </div>
 
     <div class="toolbar-right">
+      <div id="saveStatus" class="save-status">Draft Saved</div>
       <!-- Template Dropdown stays here -->
       <div class="tpl-dropdown-wrap" id="tplDropdownWrap">
         <button class="btn-template" onclick="toggleTplDropdown(event)">
@@ -5039,6 +5120,10 @@
     function paginateCanvas(canvas) {
       if (!canvas) return;
 
+      // Save scroll position before repagination
+      const scrollEl = document.documentElement;
+      const savedScrollY = scrollEl.scrollTop || window.scrollY;
+
       // Restore original flat HTML first so measurements are clean
       restoreOriginal(canvas);
 
@@ -5046,6 +5131,11 @@
       requestAnimationFrame(() => {
         _doPaginate(canvas);
         buildPageGrid(canvas);
+
+        // Restore scroll position after repagination
+        requestAnimationFrame(() => {
+          window.scrollTo({ top: savedScrollY, behavior: 'instant' });
+        });
       });
     }
 
@@ -5265,7 +5355,8 @@
       }
 
       nav.style.display = 'flex';
-      _currentPage = 0;
+      // Keep current page index; clamp in case page count decreased
+      _currentPage = Math.min(_currentPage || 0, total - 1);
 
       // ── render the nav ──────────────────────────
       function render(current) {
@@ -5351,8 +5442,8 @@
         return s;
       }
 
-      // Initial render
-      render(0);
+      // Initial render — use saved current page, not always 0
+      render(_currentPage);
 
       // Update active pill on scroll via IntersectionObserver
       if (_pgObserver) _pgObserver.disconnect();
@@ -5857,6 +5948,18 @@
       });
     }
 
+    // Always track the latest selection inside any contenteditable
+    document.addEventListener('selectionchange', () => {
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount > 0 && !sel.isCollapsed) {
+        const node = sel.anchorNode;
+        const el = node && (node.nodeType === 3 ? node.parentElement : node);
+        if (el && el.closest('[contenteditable="true"]')) {
+          window._savedRange = sel.getRangeAt(0).cloneRange();
+        }
+      }
+    });
+
     // Re-paginate after editing (debounced 1s)
     let _pgTimer = null;
     document.addEventListener('input', () => {
@@ -6220,11 +6323,112 @@
     // ══════════════════════════════════════════════════════════════
     //  TEXT FORMATTING & STYLE TOOLS
     // ══════════════════════════════════════════════════════════════
+    // ── Selection save/restore (needed for color picker which steals focus) ──
+    window._savedRange = window._savedRange || null;
+
+    function saveSelection() {
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount > 0 && !sel.isCollapsed) {
+        window._savedRange = sel.getRangeAt(0).cloneRange();
+      }
+    }
+
+    function restoreSelection() {
+      if (!window._savedRange) return false;
+      // Focus the contenteditable that owns the saved range
+      let container = window._savedRange.commonAncestorContainer;
+      if (container.nodeType === 3) container = container.parentElement;
+      const editable = container && container.closest
+        ? container.closest('[contenteditable="true"]')
+        : null;
+      if (editable) editable.focus();
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(window._savedRange);
+      return true;
+    }
+
+    function restoreSelectionAndApply(command, value) {
+      if (!restoreSelection()) return;
+      document.execCommand(command, false, value);
+      autoSave();
+      if (typeof paginateActive === 'function') paginateActive();
+    }
+
     function applyStyle(command, value = null) {
       document.execCommand(command, false, value);
       autoSave();
       if (typeof paginateActive === 'function') paginateActive();
     }
+
+    // ── Custom Color Palette ───────────────────────────────────────
+    const _paletteColors = [
+      '#000000','#1a1a2e','#16213e','#0f3460','#1B2838','#2d3436',
+      '#636e72','#b2bec3','#dfe6e9','#ffffff','#d63031','#e17055',
+      '#e84393','#fd79a8','#e74c3c','#c0392b','#e67e22','#f39c12',
+      '#fdcb6e','#f9ca24','#6ab04c','#27ae60','#00b894','#55efc4',
+      '#0984e3','#2980b9','#74b9ff','#a29bfe','#6c5ce7','#9b59b6',
+      '#3282b8','#4A90D9','#22D3EE','#7C3AED','#10B981','#D4A843',
+    ];
+
+    let _currentSwatchColor = '#e53e3e';
+
+    function initColorPalette() {
+      const container = document.getElementById('cpSwatches');
+      if (!container || container.childElementCount > 0) return;
+      _paletteColors.forEach(color => {
+        const s = document.createElement('div');
+        s.className = 'cp-swatch';
+        s.style.background = color;
+        s.title = color;
+        // Use mousedown + preventDefault so focus never leaves contenteditable
+        s.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          applyPaletteColor(color);
+        });
+        container.appendChild(s);
+      });
+    }
+
+    function toggleColorPalette(e) {
+      e.stopPropagation();
+      const panel = document.getElementById('colorPalettePanel');
+      const isOpen = panel.classList.contains('open');
+      // Close all other dropdowns
+      document.getElementById('bulletPickerPanel').style.display = 'none';
+      panel.classList.toggle('open', !isOpen);
+      if (!isOpen) initColorPalette();
+    }
+
+    function applyPaletteColor(color) {
+      // Close panel
+      document.getElementById('colorPalettePanel').classList.remove('open');
+      // Update button preview
+      document.getElementById('colorSwatchBtn').style.background = color;
+      _currentSwatchColor = color;
+      // Restore selection and apply color
+      if (!restoreSelection()) return;
+      document.execCommand('foreColor', false, color);
+      autoSave();
+      if (typeof paginateActive === 'function') paginateActive();
+    }
+
+    function applyCustomColor() {
+      const hex = document.getElementById('cpHexInput').value.trim();
+      if (/^#[0-9a-fA-F]{3,6}$/.test(hex)) {
+        applyPaletteColor(hex);
+      }
+    }
+
+    // Close color palette on outside click (but NOT on swatch clicks — they handle themselves)
+    document.addEventListener('click', function(e) {
+      const panel = document.getElementById('colorPalettePanel');
+      const btn   = document.getElementById('colorSwatchBtn');
+      if (panel && !panel.contains(e.target) && !btn.contains(e.target)) {
+        panel.classList.remove('open');
+      }
+    });
 
     // ── Bullet / List helpers ──────────────────────────────────────
     function toggleBulletPicker(e) {
@@ -6340,6 +6544,31 @@
           case 'u': e.preventDefault(); applyStyle('underline'); break;
           case 'z': e.preventDefault(); UndoManager.undo(); break;
           case 'y': e.preventDefault(); UndoManager.redo(); break;
+          case 's':
+            e.preventDefault();
+            // Flush any pending debounce and save immediately
+            clearTimeout(_saveTimer);
+            const activeCard = document.querySelector('.tpl-card.active');
+            if (!activeCard) break;
+            const saveData = { activeTpl: activeCard.dataset.tpl, templates: {} };
+            document.querySelectorAll('.cv-canvas').forEach(canvas => {
+              if (_origHTML[canvas.id]) {
+                saveData.templates[canvas.id] = _origHTML[canvas.id];
+              } else {
+                const clone = canvas.cloneNode(true);
+                cleanupPagination(clone);
+                saveData.templates[canvas.id] = clone.innerHTML;
+              }
+            });
+            CVStorage.save(saveData);
+            if (typeof UndoManager !== 'undefined') UndoManager.pushState();
+            const status = document.getElementById('saveStatus');
+            if (status) {
+              status.textContent = 'Saved Data Successfully';
+              status.classList.add('visible');
+              setTimeout(() => { status.classList.remove('visible'); }, 2500);
+            }
+            break;
         }
       }
     });
