@@ -377,62 +377,79 @@
     =========================== */
     .side-toolbar {
       position: fixed;
-      left: 18px;
+      left: 10px;
       top: 50%;
       transform: translateY(-50%);
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 6px;
       z-index: 500;
       background: rgba(15, 23, 42, 0.95);
       backdrop-filter: blur(20px);
-      padding: 14px;
-      border-radius: 18px;
+      padding: 8px 6px;
+      border-radius: 12px;
       border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
       transition: all 0.3s ease;
     }
 
     .side-toolbar:hover {
       border-color: rgba(212, 168, 67, 0.2);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
     }
 
-    .side-toolbar button, 
+    .side-toolbar button,
     .side-toolbar .side-btn-wrap {
-      width: 46px;
-      height: 46px;
-      padding: 0;
+      width: 45px;
+      height: auto;
+      min-height: 45px;
+      padding: 5px 0 4px;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
+      gap: 2px;
       border: none;
-      border-radius: 12px;
+      border-radius: 10px;
       cursor: pointer;
-      font-size: 20px;
+      font-size: 16px;
       position: relative;
       transition: all 0.2s;
       color: #fff;
     }
 
-    .side-toolbar button:hover {
-      transform: scale(1.08);
-      filter: brightness(1.1);
+    .side-toolbar button .side-label {
+      font-size: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 0.3px;
+      line-height: 1;
+      pointer-events: none;
     }
 
-    /* Tooltip */
+    .side-toolbar button:hover .side-label {
+      color: #fff;
+    }
+
+    .side-toolbar button:hover {
+      transform: scale(1.08);
+      filter: brightness(1.15);
+    }
+
+    /* Tooltip — keep for accessibility but hide visually since we have labels */
     .side-toolbar button::before {
       content: attr(data-tooltip);
       position: absolute;
       left: 100%;
       top: 50%;
       transform: translateY(-50%);
-      margin-left: 12px;
+      margin-left: 10px;
       background: #1e293b;
       color: #fff;
-      padding: 6px 12px;
+      padding: 4px 10px;
       border-radius: 6px;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 600;
       white-space: nowrap;
       opacity: 0;
@@ -443,13 +460,13 @@
 
     .side-toolbar button:hover::before {
       opacity: 1;
-      transform: translateY(-50%) translateX(5px);
+      transform: translateY(-50%) translateX(4px);
     }
 
     .side-sep {
       height: 1px;
       background: rgba(255, 255, 255, 0.1);
-      margin: 4px 0;
+      margin: 2px 0;
     }
 
     /* Relocate custom dropdown menu for side bar */
@@ -597,22 +614,16 @@
 
     .overlay.visible { display: block; }
     /* Pagination & Status absolutely-centered inside the toolbar */
-    .toolbar-center {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
+    /* Pagination bar — sits between toolbar and CV canvas */
+    .pg-bar {
+      width: 100%;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      pointer-events: none;
-      width: fit-content;
-      z-index: 10;
-    }
-
-    .toolbar-center>* {
-      pointer-events: auto;
+      padding: 3px 0;
+      background: #0f172a;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      min-height: 28px;
     }
 
     /* Save status indicator */
@@ -1020,18 +1031,19 @@
       gap: 0;
       background: rgba(255, 255, 255, .06);
       border: 1px solid rgba(255, 255, 255, .12);
-      border-radius: 10px;
+      border-radius: 6px;
       overflow: hidden;
+      height: 22px;
     }
 
     /* Prev / Next arrow buttons */
     .pg-btn {
-      width: 36px;
-      height: 36px;
+      width: 22px;
+      height: 22px;
       border: none;
       background: transparent;
       color: rgba(255, 255, 255, .55);
-      font-size: 14px;
+      font-size: 12px;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -1053,7 +1065,7 @@
     /* Dividers */
     .pg-sep {
       width: 1px;
-      height: 20px;
+      height: 14px;
       background: rgba(255, 255, 255, .1);
       flex-shrink: 0;
     }
@@ -1066,12 +1078,12 @@
     }
 
     .pg-pill {
-      min-width: 36px;
-      height: 36px;
+      min-width: 22px;
+      height: 22px;
       border: none;
       background: transparent;
       color: rgba(255, 255, 255, .45);
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 600;
       font-family: 'DM Sans', sans-serif;
       cursor: pointer;
@@ -1091,28 +1103,28 @@
     .pg-pill.active-pill {
       color: #D4A843;
       font-weight: 700;
-      font-size: 12px;
+      font-size: 10px;
     }
 
     .pg-pill.active-pill::after {
       content: '';
       position: absolute;
-      bottom: 4px;
+      bottom: 2px;
       left: 50%;
       transform: translateX(-50%);
-      width: 16px;
-      height: 2px;
+      width: 10px;
+      height: 1.5px;
       border-radius: 2px;
       background: #D4A843;
     }
 
     /* "N / Total" counter chip */
     .pg-counter {
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 700;
       color: rgba(255, 255, 255, .6);
       font-family: 'DM Sans', sans-serif;
-      padding: 0 14px;
+      padding: 0 8px;
       letter-spacing: .5px;
       white-space: nowrap;
     }
@@ -1123,13 +1135,13 @@
 
     /* dots for long page lists */
     .pg-dots {
-      min-width: 28px;
-      height: 36px;
+      min-width: 20px;
+      height: 22px;
       display: flex;
       align-items: center;
       justify-content: center;
       color: rgba(255, 255, 255, .3);
-      font-size: 10px;
+      font-size: 9px;
       pointer-events: none;
     }
 
@@ -1278,9 +1290,9 @@
     }
 
     @media print {
-      .toolbar, .tpl-dropdown-wrap, .toolbar-center, 
-      .sec-ctrl, .entry-del, .tpl-section-header, .page-num-badge, .add-section-row, .btn-del-sec-custom { 
-        display: none !important; 
+      .toolbar, .tpl-dropdown-wrap, .pg-bar,
+      .sec-ctrl, .entry-del, .tpl-section-header, .page-num-badge, .add-section-row, .btn-del-sec-custom {
+        display: none !important;
       }
       .cv-canvas { box-shadow: none !important; margin: 0 !important; }
 
@@ -2971,11 +2983,11 @@
      SIDE TOOLBAR (Left Vertical)
   ══════════════════════════════════ -->
   <div class="side-toolbar">
-    <button onclick="triggerImport()" style="background:#8B5CF6;" data-tooltip="Import CV (PDF/DOCX)">📤</button>
-    <button onclick="addManualPage()" style="background:#2563EB;" data-tooltip="Add Manual Page">➕</button>
-    
+    <button onclick="triggerImport()" style="background:#8B5CF6;" data-tooltip="Import CV (PDF/DOCX)">📤<span class="side-label">Import</span></button>
+    <button onclick="addManualPage()" style="background:#2563EB;" data-tooltip="Add Manual Page">➕<span class="side-label">Add Page</span></button>
+
     <div class="side-btn-wrap custom-dropdown">
-       <button onclick="toggleCustomMenu()" style="background:#059669;" data-tooltip="Add Custom Section">📋</button>
+       <button onclick="toggleCustomMenu()" style="background:#059669;" data-tooltip="Add Custom Section">📋<span class="side-label">Section</span></button>
        <div id="customSectionMenu" class="dropdown-content" style="display:none; position:absolute; left:100%; top:0; background:white; border-radius:8px; box-shadow:0 10px 30px rgba(0,0,0,0.1); z-index:100; min-width:180px; padding:10px; text-align:left; margin-left:15px">
           <div style="font-size:11px; font-weight:bold; color:#64748b; margin-bottom:8px; padding-left:10px; border-bottom:1px solid #f1f5f9; padding-bottom:5px;">SELECT TYPE</div>
           <a href="#" onclick="addNewCustomSection('points')" style="color:#1e293b; padding:8px 10px; display:block; text-decoration:none; font-size:12px; border-radius:4px; transition:0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='white'">📋 Bullet Points</a>
@@ -2985,10 +2997,10 @@
     </div>
 
     <div class="side-sep"></div>
-    
-    <button onclick="toggleVersions()" style="background:#475569;" data-tooltip="Version History">📜</button>
-    <button onclick="manualSave()" style="background:#10B981;" data-tooltip="Save Draft">💾</button>
-    <button onclick="exportPDF()" style="background:#06B6D4;" data-tooltip="Export to PDF">⬇</button>
+
+    <button onclick="toggleVersions()" style="background:#475569;" data-tooltip="Version History">📜<span class="side-label">History</span></button>
+    <button onclick="manualSave()" style="background:#10B981;" data-tooltip="Save Draft">💾<span class="side-label">Save</span></button>
+    <button onclick="exportPDF()" style="background:#06B6D4;" data-tooltip="Export to PDF">⬇<span class="side-label">Export</span></button>
   </div>
 
   <!-- ══════════════════════════════════
@@ -3110,11 +3122,6 @@
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- Pagination -->
-    <div class="toolbar-center">
-      <nav class="pg-nav" id="pgNav" aria-label="Page navigation"></nav>
     </div>
 
     <div class="toolbar-right">
@@ -3253,6 +3260,13 @@
       <!-- Versions injected by JS -->
       <div class="v-empty">No saved versions found.</div>
     </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+     PAGINATION BAR
+  ══════════════════════════════════ -->
+  <div class="pg-bar" id="pgBar">
+    <nav class="pg-nav" id="pgNav" aria-label="Page navigation"></nav>
   </div>
 
   <!-- ══════════════════════════════════
@@ -5349,12 +5363,15 @@
 
       nav.innerHTML = '';
 
+      const pgBar = document.getElementById('pgBar');
       if (total <= 1) {
         nav.style.display = 'none';
+        if (pgBar) pgBar.style.display = 'none';
         return;
       }
 
       nav.style.display = 'flex';
+      if (pgBar) pgBar.style.display = 'flex';
       // Keep current page index; clamp in case page count decreased
       _currentPage = Math.min(_currentPage || 0, total - 1);
 
