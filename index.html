@@ -2990,9 +2990,9 @@
        <button onclick="toggleCustomMenu()" style="background:#059669;" data-tooltip="Add Custom Section">📋<span class="side-label">Section</span></button>
        <div id="customSectionMenu" class="dropdown-content" style="display:none; position:absolute; left:100%; top:0; background:white; border-radius:8px; box-shadow:0 10px 30px rgba(0,0,0,0.1); z-index:100; min-width:180px; padding:10px; text-align:left; margin-left:15px">
           <div style="font-size:11px; font-weight:bold; color:#64748b; margin-bottom:8px; padding-left:10px; border-bottom:1px solid #f1f5f9; padding-bottom:5px;">SELECT TYPE</div>
-          <a href="#" onclick="addNewCustomSection('points')" style="color:#1e293b; padding:8px 10px; display:block; text-decoration:none; font-size:12px; border-radius:4px; transition:0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='white'">📋 Bullet Points</a>
-          <a href="#" onclick="addNewCustomSection('text')" style="color:#1e293b; padding:8px 10px; display:block; text-decoration:none; font-size:12px; border-radius:4px; transition:0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='white'">📝 Free Text Block</a>
-          <a href="#" onclick="addNewCustomSection('experience')" style="color:#1e293b; padding:8px 10px; display:block; text-decoration:none; font-size:12px; border-radius:4px; transition:0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='white'">💼 Title + Subtitle</a>
+          <a href="#" onclick="addNewCustomSection('points'); return false;" style="color:#1e293b; padding:8px 10px; display:block; text-decoration:none; font-size:12px; border-radius:4px; transition:0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='white'">📋 Bullet Points</a>
+          <a href="#" onclick="addNewCustomSection('text'); return false;" style="color:#1e293b; padding:8px 10px; display:block; text-decoration:none; font-size:12px; border-radius:4px; transition:0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='white'">📝 Free Text Block</a>
+          <a href="#" onclick="addNewCustomSection('experience'); return false;" style="color:#1e293b; padding:8px 10px; display:block; text-decoration:none; font-size:12px; border-radius:4px; transition:0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='white'">💼 Title + Subtitle</a>
        </div>
     </div>
 
@@ -5130,6 +5130,22 @@
       canvas.querySelectorAll('.page-break-divider, .page-num-badge').forEach(el => el.remove());
     }
 
+    // ── Make all section headings editable ──────────────────────
+    function makeHeadingsEditable() {
+      const selectors = [
+        '.sec-heading', '.sec-heading-main', '.sdb-heading',
+        '.t-sec-head', '.m-sec-head'
+      ];
+      document.querySelectorAll(selectors.join(',')).forEach(el => {
+        if (!el.hasAttribute('contenteditable')) {
+          el.setAttribute('contenteditable', 'true');
+          el.setAttribute('spellcheck', 'false');
+          el.style.cursor = 'text';
+          el.style.outline = 'none';
+        }
+      });
+    }
+
     // ── Main entry ───────────────────────────────────────────────
     function paginateCanvas(canvas) {
       if (!canvas) return;
@@ -5146,9 +5162,10 @@
         _doPaginate(canvas);
         buildPageGrid(canvas);
 
-        // Restore scroll position after repagination
+        // Restore scroll position after repagination and re-apply editable headings
         requestAnimationFrame(() => {
           window.scrollTo({ top: savedScrollY, behavior: 'instant' });
+          makeHeadingsEditable();
         });
       });
     }
@@ -5898,10 +5915,13 @@
         if (card) switchTemplate(savedId, card);
       }
 
+      // Make all section headings editable
+      makeHeadingsEditable();
+
       // Initial pagination (multiple attempts to capture layout)
       setTimeout(paginateActive, 100);
       setTimeout(paginateActive, 500);
-      setTimeout(paginateActive, 1200);
+      setTimeout(() => { paginateActive(); makeHeadingsEditable(); }, 1200);
 
       // MutationObserver for auto-save
       const observer = new MutationObserver(() => {
